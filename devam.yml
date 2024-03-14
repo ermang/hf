@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hf-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: n8nio/n8n:0.227.0
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "1"
+            memory: "4Gi"
+        env:
+          - name: GENERIC_TIMEZONE
+            value: Europe/Istanbul
+          - name: EXECUTIONS_PROCESS
+            value: main
+          - name: NODE_OPTIONS
+            value: --max-old-space-size=4096
+        ports:
+        - containerPort: 5678
+        volumeMounts:
+          - name: n8n-persistent-storage
+            mountPath: /home/node/.n8n
+      volumes:
+        - name: n8n-persistent-storage
+          persistentVolumeClaim:
+            claimName: n8n-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hf-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5678
+    nodePort: 30080
+  type: NodePort
+  

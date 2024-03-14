@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elastic
+  template:
+    metadata:
+      labels:
+        app: elastic
+    spec:
+      containers:
+      - name: elastic
+        image: elasticsearch:8.7.1
+        env:
+          - name: discovery.type
+            value: single-node
+        ports:
+        - containerPort: 9200
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+        - name: elastic-data-persistent-storage
+          mountPath: /usr/share/elasticsearch/data
+          subPath: elastic-data-storage
+#        - name: elastic-config-persistent-storage
+#          mountPath: /usr/share/elasticsearch/config
+#          subPath: elastic-config-storage
+      volumes:
+      - name: config-volume
+        configMap:
+          name: elastic-config
+      - name: elastic-data-persistent-storage
+        persistentVolumeClaim:
+          claimName: elastic-data-pvc
+#      - name: elastic-config-persistent-storage
+#        persistentVolumeClaim:
+#          claimName: elastic-config-pvc

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-worker-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: n8n-worker
+  template:
+    metadata:
+      labels:
+        app: n8n-worker
+    spec:
+      containers:
+      - name: n8n-worker
+        image: n8nio/n8n:0.227.1
+        command: ["n8n", "worker"]
+        resources:
+          requests:
+            cpu: "1"
+            memory: "1Gi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+        env:
+          - name: DB_TYPE
+            value: postgresdb
+          - name: DB_POSTGRESDB_HOST
+            value: postgres-service
+          - name: DB_POSTGRESDB_USER
+            value: root
+          - name: DB_POSTGRESDB_PASSWORD
+            value: root
+          - name: GENERIC_TIMEZONE
+            value: Europe/Istanbul
+          - name: EXECUTIONS_PROCESS
+            value: main
+          - name: EXECUTIONS_MODE
+            value: queue
+          - name: QUEUE_BULL_REDIS_HOST
+            value: redis-service
+          - name: NODE_OPTIONS
+            value: --max-old-space-size=4096
+          - name: CUSTOM_REDIS_HOST
+            value: redis-service
+          - name: TZ
+            value: "Europe/Istanbul"
+        ports:
+        - containerPort: 5678
+        volumeMounts:
+          - name: n8n-persistent-storage
+            mountPath: /home/node/.n8n
+            subPath: n8n-storage
+      volumes:
+        - name: n8n-persistent-storage
+          persistentVolumeClaim:
+            claimName: n8n-pvc

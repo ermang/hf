@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13.11
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "1"
+            memory: "4Gi"
+        env:
+          - name: POSTGRES_USER
+            value: root
+          - name: POSTGRES_PASSWORD
+            value: root
+          - name: GENERIC_TIMEZONE
+            value: Europe/Istanbul
+          - name: EXECUTIONS_PROCESS
+            value: main
+          - name: EXECUTIONS_MODE
+            value: queue
+          - name: QUEUE_BULL_REDIS_HOST
+            value: redis-service
+          - name: NODE_OPTIONS
+            value: --max-old-space-size=4096
+          - name: CUSTOM_REDIS_HOST
+            value: redis-service
+          - name: TZ
+            value: "Europe/Istanbul"
+#        ports:
+#        - containerPort: 5678
+#        volumeMounts:
+#          - name: n8n-persistent-storage
+#            mountPath: /home/node/.n8n
+#            subPath: n8n-storage
+#      volumes:
+#        - name: n8n-persistent-storage
+#          persistentVolumeClaim:
+#            claimName: n8n-pvc

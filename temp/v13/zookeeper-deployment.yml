@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - name: zookeeper
+        image: confluentinc/cp-zookeeper:7.3.0
+#        resources:
+#          requests:
+#            cpu: "1"
+#            memory: "2Gi"
+#          limits:
+#            cpu: "1"
+#            memory: "4Gi"
+        env:
+          - name: ZOOKEEPER_CLIENT_PORT
+            value: "2181"
+#          - name: KAFKA_CFG_ADVERTISED_LISTENERS
+#            value: PLAINTEXT://:9092
+#            value: PLAINTEXT://192.168.49.2:30089
+          - name: TZ
+            value: "Europe/Istanbul"
+#        ports:
+#        - containerPort: 5678
+

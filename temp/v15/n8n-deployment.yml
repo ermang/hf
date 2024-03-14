@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      containers:
+      - name: n8n
+        image: n8nio/n8n:0.227.1
+#        resources:
+#          requests:
+#            cpu: "1"
+#            memory: "2Gi"
+#          limits:
+#            cpu: "1"
+#            memory: "4Gi"
+        env:
+          - name: GENERIC_TIMEZONE
+            value: Europe/Istanbul
+          - name: EXECUTIONS_PROCESS
+            value: main
+#          - name: CUSTOM_REDIS_HOST
+#            value: redis-service
+          - name: TZ
+            value: "Europe/Istanbul"
+        ports:
+        - containerPort: 5678
+

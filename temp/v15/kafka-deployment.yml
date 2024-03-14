@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: bitnami/kafka:3.4.1-debian-11-r49
+#        resources:
+#          requests:
+#            cpu: "1"
+#            memory: "2Gi"
+#          limits:
+#            cpu: "1"
+#            memory: "4Gi"
+        env:
+          - name: ALLOW_PLAINTEXT_LISTENER
+            value: "yes"
+          - name: KAFKA_CFG_ADVERTISED_LISTENERS
+#            value: PLAINTEXT://:9092
+            value: PLAINTEXT://192.168.49.2:30089
+          - name: TZ
+            value: "Europe/Istanbul"
+#        ports:
+#        - containerPort: 5678
+        volumeMounts:
+        - name: kafka-data-persistent-storage
+          mountPath: /bitnami/kafka
+          subPath: kafka-data-storage
+      volumes:
+      - name: kafka-data-persistent-storage
+        persistentVolumeClaim:
+          claimName: kafka-pvc
